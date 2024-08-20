@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ParamsMapper">
+    <insert id="save" parameterType="com.universe.backend.database.mapper.ParamsMapper">
+        insert into `common_param` (id, name, param_data, group_name, data_type, description, project_id,
+        create_user, update_user, update_time, create_time) values
+        (#{id}, #{name}, #{paramData}, #{groupName}, #{dataType}, #{description}, #{projectId},
+        #{createUser}, #{updateUser}, #{updateTime}, #{createTime})
+        ON DUPLICATE KEY UPDATE
+        <if test="name != null and name != ''">
+            name = #{name},
+        </if>
+        <if test="paramData != null and paramData != ''">
+            param_data = #{paramData},
+        </if>
+        <if test="dataType != null and dataType != ''">
+            data_type = #{dataType},
+        </if>
+        <if test="description != null and description != ''">
+            description = #{description},
+        </if>
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+    </insert>
+    <update id="delete" parameterType="java.lang.String">
+        update `common_param` set status=0 where id=#{id}
+    </update>
+    <select id="getParamByName" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Params">
+        select id, name from `common_param`
+        where name = #{name} and project_id = #{projectId} and status =1
+    </select>
+    <select id="getParamDetail" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Params">
+        select  * from `common_param` where id = #{id}
+    </select>
+    <select id="getAllParams" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Params">
+        select id, name from `common_param`
+        where project_id = #{projectId} and group_name = #{groupName} and status =1
+    </select>
+    <select id="getParamList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Params">
+        select cp.*, u.username from `common_param` cp
+        left join `user` u on u.id = cp.create_user
+        where cp.project_id = #{projectId} and cp.group_name = #{groupName} and cp.status =1
+        <if test="condition!=null and condition!=''">
+            and cp.name like #{condition}
+        </if>
+        order by cp.update_time desc
+    </select>
+    <select id="getParamByGroup" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Params">
+        select id, name from `common_param`
+        where project_id = #{projectId} and group_name = #{groupName} and status =1
+    </select>
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ControlMapper">
+    <insert id="addControl" parameterType="com.universe.backend.database.domain.Control">
+        insert into control (id, name, `system`, module_id, project_id, `by`, expression, description,
+                             create_time, update_time, create_user, update_user) values
+            ( #{id}, #{name}, #{system}, #{moduleId}, #{projectId}, #{by}, #{expression}, #{description},
+              #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+    <update id="updateControl" parameterType="com.universe.backend.database.domain.Control">
+        update control set name=#{name}, `system`=#{system}, module_id=#{moduleId}, `by`=#{by}, expression=#{expression},
+                           description=#{description}, update_time=#{updateTime}, update_user=#{updateUser}
+        where id=#{id}
+    </update>
+    <update id="deleteControl" parameterType="java.lang.String">
+        update control set status = 0 where id = #{id}
+    </update>
+    <select id="getControlList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.dto.ControlDTO">
+        select co.*, vm.name as moduleName from control co
+        left join module vm on vm.id = co.module_id
+        where co.status = 1 and co.project_id = #{projectId}
+        <if test="moduleId != null and moduleId != ''">
+            and co.module_id = #{moduleId}
+        </if>
+        <if test="system != null and system != ''">
+            and co.`system` = #{system}
+        </if>
+        <if test="condition != null and condition != ''">
+            and ((co.name like #{condition}) or (co.num like #{condition}))
+        </if>
+        order by co.update_time desc
+    </select>
+    <select id="getControlById" parameterType="java.lang.String" resultType="com.universe.backend.dto.ControlDTO">
+        select co.*, vm.name as moduleName from control co
+        left join module vm on vm.id = co.module_id
+        where co.status = 1 and co.id = #{id}
+    </select>
+</mapper>

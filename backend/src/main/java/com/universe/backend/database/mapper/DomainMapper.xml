@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.DomainMapper">
+    <insert id="saveDomain" parameterType="com.universe.backend.database.domain.Domain">
+        insert into `domain` (id, `type`, domain_key, domain_value, environment_id, create_time, update_time, create_user, update_user)
+        values (#{id}, #{type}, #{domainKey}, #{domainValue}, #{environmentId}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+        ON DUPLICATE KEY UPDATE
+        update_time = #{updateTime}, update_user = #{updateUser}
+        <if test="type != null and type != ''">
+            ,`type` = #{type}
+        </if>
+        <if test="domainKey != null and domainKey != ''">
+            ,domain_key = #{domainKey}
+        </if>
+        <if test="domainValue != null and domainValue != ''">
+            ,domain_value = #{domainValue}
+        </if>
+    </insert>
+    <select id="getDomainByName" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Domain">
+        select * from domain where environment_id = #{environmentId} and domain_key = #{domainKey}
+    </select>
+    <select id="getDomainList" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Domain">
+        select dom.*, ss.name as serverSignName
+        from `domain` dom
+                 left join server_sign ss on ss.id = dom.domain_key
+        where dom.environment_id = #{environmentId}
+        order by dom.update_time desc
+    </select>
+    <delete id="deleteDomain" parameterType="java.lang.String">
+        delete from domain where id = #{id}
+    </delete>
+</mapper>

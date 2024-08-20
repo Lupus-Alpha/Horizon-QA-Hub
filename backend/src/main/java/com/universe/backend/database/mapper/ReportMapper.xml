@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ReportMapper">
+    <insert id="addReport" parameterType="com.universe.backend.database.domain.Report">
+        insert into report (id, name, engine_id, environment_id, device_id, source_type, source_id, status,
+                            project_id, create_time, update_time, create_user, update_user,pass_count,fail_count,error_count)
+        values (#{id}, #{name}, #{engineId}, #{environmentId}, #{deviceId}, #{sourceType}, #{sourceId}, #{status},
+                #{projectId}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser},#{passCount},#{failCount},#{errorCount})
+    </insert>
+
+    <select id="getReportList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.dto.ReportDTO">
+        select *,
+        concat(round(r.pass_count * 100 / r.total, 2), '%') as passRate,
+        round((r.pass_count + r.fail_count + r.error_count) * 100 / r.total, 0) as progress
+        from report r
+        where r.project_id = #{projectId}
+        <if test="condition != null and condition != ''">
+            and r.name like #{condition}
+        </if>
+        <if test="collectionId != null and collectionId != ''">
+            and r.source_id = #{collectionId} and r.source_type = 2
+        </if>
+        <if test="collectionId == null or collectionId == ''">
+            and r.source_type = 2
+        </if>
+        order by r.create_time desc
+    </select>
+    <update id="updateReportEndTime">
+        update report set end_time = #{endTime}, update_time = #{updateTime} where id = #{reportId}
+    </update>
+
+    <update id="updateReportStatistics" parameterType="com.universe.backend.database.domain.ReportStatistics">
+        update report set pass_count=#{passCount}, fail_count=#{failCount}, error_count=#{errorCount} where id = #{id}
+    </update>
+
+    <select id="getToRunReport" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Report">
+        select * from `report` where status = 'prepared' and engine_id = #{engineId} order by
+        <if test="engineId=='system'">
+            source_type,
+        </if>
+        create_time limit 1
+    </select>
+    <update id="updateReportToRunning" parameterType="com.universe.backend.database.domain.Report">
+        update report set start_time = #{startTime}, update_time = #{updateTime}, engine_id = #{engineId}, status=#{status}
+        where id = #{id}
+    </update>
+    <select id="getReportById" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Report">
+        select * from report where id = #{id}
+    </select>
+    <select id="getReportDetail" parameterType="java.lang.String" resultType="com.universe.backend.dto.ReportDTO">
+        select * from report where id = #{id}
+    </select>
+    <select id="getReportStatistics" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.ReportStatistics">
+        select * from report where id = #{reportId}
+    </select>
+    <update id="updateReportStatus" parameterType="java.lang.String">
+        update report set status=#{status} where id = #{id}
+    </update>
+
+</mapper>

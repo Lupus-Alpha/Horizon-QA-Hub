@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.CollectionMapper">
+    <insert id="saveCollection" parameterType="com.universe.backend.database.domain.Collection">
+        insert into `collection` (id, name, device_id, project_id, description, create_time, update_time, create_user, update_user)
+        values (#{id}, #{name}, #{deviceId}, #{projectId},#{description},#{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+    <update id="updateCollection" parameterType="com.universe.backend.database.domain.Collection">
+        update collection set name=#{name}, device_id=#{deviceId}, description=#{description},
+                              update_time=#{updateTime}, update_user=#{updateUser} where id=#{id}
+    </update>
+    <select id="getCollectionList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Collection">
+        select * from collection where project_id = #{projectId}
+        <if test="condition != null and condition != ''">
+            and name like #{condition}
+        </if>
+        order by update_time desc
+    </select>
+    <select id="getCollectionDetail" parameterType="java.lang.String" resultType="com.universe.backend.dto.CollectionDTO">
+        select * from collection where id = #{id}
+    </select>
+
+
+
+
+</mapper>

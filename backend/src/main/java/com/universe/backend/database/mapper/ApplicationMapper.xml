@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ApplicationMapper">
+    <insert id="saveApplication" parameterType="com.universe.backend.database.domain.Application">
+        insert into `application` (id, name, `system`, app_id, main_activity, description, project_id, create_time, update_time)
+        values (#{id}, #{name}, #{system}, #{appId}, #{mainActivity}, #{description}, #{projectId}, #{createTime}, #{updateTime})
+        ON DUPLICATE KEY UPDATE
+        update_time = #{updateTime}
+        <if test="name != null and name != ''">
+            ,name = #{name}
+        </if>
+        <if test="appId != null and appId != ''">
+            ,app_id = #{appId}
+        </if>
+        <if test="mainActivity != null and mainActivity != ''">
+            ,main_activity = #{mainActivity}
+        </if>
+        <if test="description != null and description != ''">
+            ,description = #{description}
+        </if>
+    </insert>
+    <select id="getApplicationByName" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Application">
+        select * from `application` where project_id = #{projectId} and name = #{name} and status = 1
+    </select>
+    <select id="getApplicationList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Application">
+        select * from `application` where project_id = #{projectId} and status = 1
+        <if test="condition != null and condition != ''">
+            and name like #{condition}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="getAllApplication" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Application">
+        select * from `application` where project_id = #{projectId} and status = 1 and `system` = #{system}
+    </select>
+    <select id="getApplicationById" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Application">
+        select * from `application` where id = #{id} and status = 1
+    </select>
+</mapper>

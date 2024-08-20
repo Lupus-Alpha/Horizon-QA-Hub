@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ElementMapper">
+    <insert id="addElement" parameterType="com.universe.backend.database.domain.Element">
+        insert into element (id, name, module_id, project_id, `by`, expression, description,
+                             create_time, update_time, create_user, update_user) values
+            ( #{id}, #{name}, #{moduleId}, #{projectId}, #{by}, #{expression}, #{description},
+              #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+    <update id="updateElement" parameterType="com.universe.backend.database.domain.Element">
+        update element set name=#{name}, module_id=#{moduleId}, `by`=#{by}, expression=#{expression},
+                           description=#{description}, update_time=#{updateTime}, update_user=#{updateUser}
+        where id=#{id}
+    </update>
+    <update id="deleteElement" parameterType="java.lang.String">
+        update element set status = 0 where id = #{id}
+    </update>
+    <select id="getElementList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.dto.ElementDTO">
+        select el.*, pm.name as moduleName, u.username as username from element el
+        left join module pm on pm.id = el.module_id
+        left join user u on u.id = el.create_user
+        where el.status = 1 and el.project_id = #{projectId}
+        <if test="moduleId != null and moduleId != ''">
+            and el.module_id = #{moduleId}
+        </if>
+        <if test="condition != null and condition != ''">
+            and ((el.name like #{condition}) or (el.num like #{condition}))
+        </if>
+        order by el.update_time desc
+    </select>
+    <select id="getElementById" parameterType="java.lang.String" resultType="com.universe.backend.dto.ElementDTO">
+        select ele.id, ele.name, ele.module_id, ele.by, ele.expression, pm.name as moduleName
+        from element ele
+                 left join module pm on pm.id = ele.module_id
+        where ele.id = #{id}
+    </select>
+    <select id="getListModuleElements" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Element">
+        select * from element where module_id = #{moduleId} and status = 1
+    </select>
+</mapper>

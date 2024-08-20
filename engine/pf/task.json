@@ -1,0 +1,153 @@
+{
+	"taskId": "4f0cb1b5-bb7f-4abd-a3eb-c1e48364efa6",
+	"taskType": "debug",	// 任务类型 调试任务 批量执行任务
+	"downloadUrl": null,
+	"maxThread": 1,	// 当测试任务有多个集合时，并发执行，由平台决定并发数
+	"reRun": false,	// 是否重试
+	"testCollectionList": [{	// 测试集合的意义就是unittest中的testcaseclass概念 主要用于串行执行
+		"collectionId": "c5564b3d-8762-4ee7-9058-5bf9005f16ff",
+		"deviceId": null,
+		"testCaseList": [{
+			"index": 1,
+			"caseId": "c5564b3d-8762-4ee7-9058-5bf9005f16ff.json",
+			"caseType": "API"
+		}]
+	}],
+	"debugData": {
+		"comment": "1",
+		"caseId": "c5564b3d-8762-4ee7-9058-5bf9005f16ff",
+		"caseName": "【演示API用例 勿动】登录平台并获取用户信息",
+		"functions": [{	// 自定义函数
+			"code": "str_target = str_target.lower()\nsys_return(str_target)",
+			"name": "low_str",
+			"params": {
+				"types": ["String"],
+				"names": ["str_target"]
+			}
+		}, {
+			"code": "import time\nprint(1234567)\nsys_return(time.time()*1000)",
+			"name": "get_current_time",
+			"params": {
+				"types": [],
+				"names": []
+			}
+		}],
+		"params": {
+			"password": {
+				"type": "String",
+				"value": "123456"
+			},
+			"account": {
+				"type": "String",
+				"value": "demo"
+			}
+		},
+		"startDriver":true,
+		"closeDriver":true,
+		"apiList": [{
+			"apiId": "9d867af1-baa7-4154-8119-ca67665e0540",
+			"apiName": "【演示接口 勿动】登录接口",
+			"apiDesc": null,
+			"url": "http://demo.liumatest.cn",
+			"path": "/autotest/login",
+			"method": "POST",
+			"protocol": "HTTP",
+			"headers": {
+				"time": "{{@get_current_time}}"
+			},
+			"proxies": {},
+			"body": {
+				"file": [],
+				"form": [],
+				"raw": "",
+				"json": "{"account":"{{@low_str({{$account}})}}","password":"{{new_password}}"}",
+				"type": "json"
+			},
+			"query": {},
+			"rest": {},
+			"assertions": [{
+				"expect": "0",
+				"expression": "status",
+				"method": "jsonpath",
+				"function": "数字相等",
+				"from": "resBody",
+				"assertion": "equalsNumber"
+			}, {
+				"expect": "",
+				"expression": "token",
+				"method": "jsonpath",
+				"function": "不为空",
+				"from": "resHeader",
+				"assertion": "notEmpty"
+			}],
+			"relations": [{
+				"expression": "token",
+				"method": "jsonpath",
+				"name": "token",
+				"from": "resHeader"
+			}, {
+				"expression": "data.id",
+				"method": "jsonpath",
+				"name": "userId",
+				"from": "resBody"
+			}],
+			"controller": {
+				"pre": [{
+					"name": "preScript",
+					"value": "import base64\n\npsd = sys_get("password")\n\nnew_psd = base64.b64encode(psd.encode(\"utf-8\")).decode()\n\nsys_put("new_password", new_psd)"
+				}]
+			}
+		}, {
+			"apiId": "d1df3415-9cc4-42f1-a39e-024d92c73515",
+			"apiName": "【演示接口 勿动】获取用户信息",
+			"apiDesc": null,
+			"url": "http://demo.liumatest.cn",
+			"path": "/autotest/user/info/#{userId}",
+			"method": "GET",
+			"protocol": "HTTP",
+			"headers": {
+				"token": "{{token}}"
+			},
+			"proxies": {},
+			"body": {
+				"file": [],
+				"form": [],
+				"raw": "",
+				"json": "{}",
+				"type": "json"
+			},
+			"query": {},
+			"rest": {
+				"userId": "{{userId}}"
+			},
+			"assertions": [{
+				"expect": "{{userId}}",
+				"expression": "$.data.id",
+				"method": "jsonpath",
+				"from": "resBody",
+				"assertion": "equals"
+			}],
+			"relations": [],
+			"controller": {}
+		}],
+		"optList": [
+			{
+				"operationId": "uuid",
+				"operationName": "自定义",
+				"operationType": "页面",	// 浏览器、页面、断言、关联、条件、循环、自定义场景
+				"operationTrans": "登录",
+				"operationElement": {
+					"element": {
+						"by": "XPATH",
+						"expression": ""
+					}
+				},
+				"operationData": {
+					"text": "{{username}}"
+				},
+				"code": "可执行的Python代码"
+
+			}
+		]
+	}
+}

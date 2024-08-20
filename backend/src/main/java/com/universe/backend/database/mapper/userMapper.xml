@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.userMapper">
+    <select id="getUserByAccount" parameterType="java.lang.String" resultType="com.universe.backend.dto.UserDTo">
+        select * from `user` where (account = #{account} or mobile = #{account})
+    </select>
+    <select id="getUserById" parameterType="java.lang.String" resultType="com.universe.backend.dto.UserDTo">
+        select * from `user` where (id = #{id} or account = #{account})
+    </select>
+    <insert id="insertUser" parameterType="com.universe.backend.database.domain.User">
+        insert into `user` (id, account, password, username, mobile, email, update_time, create_time, last_project) values
+            (#{id}, #{account}, #{password}, #{username},#{mobile}, #{email}, #{updateTime}, #{createTime}, #{lastProject})
+    </insert>
+    <select id="getUserList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.User">
+        select * from user
+        <if test="condition!=null and condition!=''"> where username like #{condition}</if>
+
+    </select>
+    <select id="getAllUserList"  resultType="com.universe.backend.database.domain.User">
+        select * from user
+    </select>
+    <delete id="deleteUserById" parameterType="java.lang.String">
+        delete from USER where id=#{id}
+    </delete>
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.OperationMapper">
+    <insert id="saveOperation" parameterType="com.universe.backend.database.domain.Operation">
+        insert into `operation` (id, name, `type`, `from`, `systems`, elements,  data, code, description, project_id,
+        create_user, update_user, update_time, create_time) values
+        (#{id}, #{name}, #{type}, #{from}, #{system}, #{elements}, #{data}, #{code}, #{description}, #{projectId},
+        #{createUser}, #{updateUser}, #{updateTime}, #{createTime})
+        ON DUPLICATE KEY UPDATE
+        <if test="system != null and system != ''">
+            `systems` = #{system},
+        </if>
+        <if test="elements != null and elements != ''">
+            elements = #{elements},
+        </if>
+        <if test="data != null and data != ''">
+            data = #{data},
+        </if>
+        <if test="code != null and code != ''">
+            code = #{code},
+        </if>
+        <if test="description != null and description != ''">
+            description = #{description},
+        </if>
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+    </insert>
+    <select id="getOperationByName" parameterType="map" resultType="com.universe.backend.database.domain.Operation">
+        select id, name
+        from operation
+        where name = #{name}
+        and (project_id = #{projectId} or project_id='system')
+        and status = 1
+        <if test="system!=null and system=='web'">
+            and systems = 'web'
+        </if>
+        <if test="system!=null and system!='web'">
+            and systems != 'web'
+        </if>
+    </select>
+    <update id="delete" parameterType="java.lang.String">
+        update `operation` set status=0 where id=#{id}
+    </update>
+    <select id="getOperationDetail" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Operation">
+        select * from `operation` where id=#{id}
+    </select>
+    <select id="getOperationList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Operation">
+        select * from `operation` where (project_id = #{projectId} or project_id = 'system') and `type` = #{operationType}
+        <if test="uiType == 'web'">
+            and `systems` = 'web'
+        </if>
+        <if test="uiType == 'app'">
+            and (`systems` = 'app' or `systems` = 'common')
+        </if>
+        <if test="condition != null and condition != ''">
+            and name like #{condition}
+        </if>
+        and `status`=1
+    </select>
+
+    <select id="getGroupOperationList" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Operation">
+        select * from `operation` where (project_id = #{projectId} or project_id = 'system') and `type` = #{operationType}
+        <if test="uiType == 'web'">
+            and `system` = 'web'
+        </if>
+        <if test="uiType == 'app'">
+            and (`system` = #{system} or `system` = 'common')
+        </if>
+        and `status`=1
+    </select>
+</mapper>

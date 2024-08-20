@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.CaseAppMapper">
+    <insert id="addCaseApp" parameterType="java.util.List">
+        insert into case_app (id, `index`, case_id, operation_id, elements, data) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.index}, #{item.caseId}, #{item.operationId}, #{item.elements}, #{item.data})
+        </foreach>
+    </insert>
+    <delete id="deleteCaseApp" parameterType="java.lang.String">
+        delete from case_app where case_id = #{caseId}
+    </delete>
+    <select id="getCaseAppList" parameterType="java.lang.String" resultType="com.universe.backend.dto.CaseAppDTO">
+        select ca.*, op.name as operationName, op.type as operationType
+        from case_app ca
+        left join operation op on op.id = ca.operation_id
+        where ca.case_id = #{caseId} order by ca.`index`
+    </select>
+
+</mapper>

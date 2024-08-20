@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ReportCollectionMapper">
+    <insert id="addReportCollection" parameterType="java.util.List">
+        insert into report_collection (id, report_id, collection_id, collection_name) values
+       <foreach collection="list" item="item" separator="">
+              (#{item.id}, #{item.reportId}, #{item.collectionId}, #{item.collectionName})
+       </foreach>
+    </insert>
+    <select id="getReportCollection" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.ReportCollection">
+        select * from report_collection where report_id = #{reportId} and collection_id = #{collectionId}
+    </select>
+    <select id="getReportCollectionList" parameterType="java.lang.String" resultType="com.universe.backend.dto.ReportCollectionDTO">
+        select * from report_collection where report_id = #{reportId}
+    </select>
+</mapper>

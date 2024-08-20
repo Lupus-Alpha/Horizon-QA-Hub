@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.DeviceMapper">
+    <insert id="saveDevice" parameterType="com.universe.backend.database.domain.Device">
+        insert into device (id, serial, `name`, `system`, brand, model, version, sources,
+                            agent, project_id, create_time, update_time, `status`) values
+            ( #{id}, #{serial}, #{name}, #{system}, #{brand}, #{model}, #{version}, #{sources},
+              #{agent}, #{projectId}, #{createTime}, #{updateTime}, #{status})
+    </insert>
+    <update id="updateDevice" parameterType="com.universe.backend.database.domain.Device">
+        update device set
+        <if test="name != null and name != ''">
+            name = #{name},
+        </if>
+        <if test="version != null and version != ''">
+            version = #{version},
+        </if>
+        <if test="agent != null and agent != ''">
+            agent = #{agent},
+        </if>
+        <if test="projectId != null and projectId != ''">
+            project_id = #{projectId},
+        </if>
+        <if test="sources != null and sources != ''">
+            sources=#{sources},
+        </if>
+        <if test="status != null and status != ''">
+            status=#{status},
+        </if>
+        update_time=#{updateTime} where serial=#{serial}
+    </update>
+    <select id="getDeviceBySerial" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Device">
+        select * from device where serial = #{serial}
+    </select>
+    <select id="getDeviceList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Device">
+        select d.* from device d
+        where (d.project_id = #{projectId} or d.project_id = 'system')
+        <if test="condition != null and condition != ''">
+            and d.name like #{condition}
+        </if>
+        <if test="system != null and system != ''">
+            and d.system = #{system}
+        </if>
+        <if test="status != null and status != ''">
+            and d.status = #{status}
+        </if>
+        order by d.status desc, d.update_time desc
+    </select>
+    <select id="getDeviceById" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Device">
+        select * from device where id = #{id}
+    </select>
+    <select id="getDeviceListByProjectId" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Device">
+        select * from device where (`project_id` = #{projectId} or `project_id` = 'system')
+        <if test="system != 'total'">
+            and `system` = #{system} and `status` = 'online'
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.CaseApiMapper">
+    <insert id="addCaseApi" parameterType="com.universe.backend.database.domain.CaseApi">
+        insert into `case_api` (id, case_id, api_id, `index`) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.caseId}, #{item.apiId}, #{item.index})
+        </foreach>
+    </insert>
+    <delete id="deleteCaseApi" parameterType="java.lang.String">
+        delete from case_api where case_id = #{caseId}
+    </delete>
+    <select id="getCaseApiList" parameterType="java.lang.String" resultType="com.universe.backend.dto.CaseApiDTO">
+        select ca.id,ca.api_id,ca.case_id,ca.`index`,ca.assertion,ca.controller,ca.relation, a.name as apiName, a.path as apiPath, a.method as apiMethod, a.protocol as apiProtocol, a.server_sign as apiServerSign,a.body,a.`query`,a.rest
+        from case_api ca
+        left join api a on a.id = ca.api_id
+        where ca.case_id = #{caseId} order by ca.`index`
+    </select>
+</mapper>

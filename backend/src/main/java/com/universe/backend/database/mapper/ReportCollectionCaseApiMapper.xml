@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ReportCollectionCaseApiMapper">
+    <delete id="deleteByReportCaseId" parameterType="java.lang.String">
+        delete from report_collection_case_api
+        where report_collection_case_id = #{reportCaseId}
+    </delete>
+    <insert id="batchAddReportCollectionCaseApi" parameterType="java.util.List">
+        insert into report_collection_case_api (id, report_collection_case_id, `index`, api_id, api_name, api_path, exec_log, during, status)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.reportCollectionCaseId}, #{item.index}, #{item.apiId}, #{item.apiName}, #{item.apiPath}, #{item.execLog},
+            #{item.during}, #{item.status})
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ApiMapper">
+    <select id="getApiByName" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Api">
+        select * from api where name = #{name}
+    </select>
+    <select id="getApiList" parameterType="com.universe.backend.request.QueryRequest" resultType="com.universe.backend.database.domain.Api">
+        SELECT * FROM api where api.status = 1 and api.project_id = #{projectId}
+        <if test="condition != null and condition != ''">
+            AND name LIKE CONCAT('%', #{condition}, '%')
+        </if>
+        <if test="moduleId != null and moduleId != ''">
+            AND module_id = #{moduleId}
+        </if>
+        ORDER BY update_time DESC
+    </select>
+    <insert id="saveApi" parameterType="com.universe.backend.database.domain.Api">
+        insert into api (id, name, module_id, project_id, method, path, protocol, server_sign, description,
+                         header, body, query, rest, create_time, update_time, create_user, update_user) values
+            ( #{id}, #{name}, #{moduleId}, #{projectId}, #{method}, #{path}, #{protocol}, #{serverSign},
+              #{description}, #{header}, #{body}, #{query}, #{rest}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+
+    </insert>
+    <update id="updateApi" parameterType="com.universe.backend.database.domain.Api">
+        update api set name=#{name}, module_id=#{moduleId}, method=#{method}, path=#{path}, protocol=#{protocol},
+                        server_sign=#{serverSign}, description=#{description}, header=#{header}, body=#{body}, query=#{query}, rest=#{rest},
+                        update_time=#{updateTime}, update_user=#{updateUser}
+        where id=#{id}
+    </update>
+    <delete id="deleteApi" parameterType="java.lang.String">
+        update api set status = 0 where id = #{id}
+    </delete>
+    <select id="getApiById" parameterType="java.lang.String" resultType="com.universe.backend.database.domain.Api">
+        select a.*, am.name as moduleName from api a
+        left join module am on am.id = a.module_id
+        where a.id = #{id}
+    </select>
+</mapper>

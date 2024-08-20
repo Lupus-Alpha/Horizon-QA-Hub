@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.universe.backend.database.mapper.ModuleMapper">
+    <insert id="saveModule" parameterType="com.universe.backend.dto.ModuleDTO">
+        insert into module (id, name, parent_id, project_id, create_time, update_time, create_user, update_user, module_type)
+        values (#{id}, #{name}, #{parentId}, #{projectId}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser}, #{moduleType})
+        ON DUPLICATE KEY UPDATE
+        update_time = #{updateTime}, update_user = #{updateUser}
+        <if test="parentId != null and parentId != ''">
+            ,parent_id = #{parentId}
+        </if>
+    </insert>
+    <select id="getModuleList" parameterType="java.lang.String" resultType="com.universe.backend.dto.ModuleDTO">
+        select *, name as label from module where project_id = #{projectId} and module_type = #{moduleType} order by create_time
+    </select>
+    <select id="getModuleByParentAndName" parameterType="java.lang.String" resultType="com.universe.backend.dto.ModuleDTO">
+        select * from module where parent_id = #{parentId} and name = #{name} and project_id = #{projectId}
+    </select>
+    <delete id="deleteModule" parameterType="java.lang.String">
+        delete from module where id = #{id}
+    </delete>
+    <select id="getModuleDataById" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(id) from
+        <if test="moduleType == 'api_module'">
+            `api`
+        </if>
+        <if test="moduleType == 'case_module'">
+            `case`
+        </if>
+        <if test="moduleType == 'page_module'">
+            `element`
+        </if>
+        <if test="moduleType == 'view_module'">
+            `control`
+        </if>
+        where module_id = #{moduleId} and status = 1
+    </select>
+
+</mapper>
